@@ -1,9 +1,20 @@
-import org.scalatest.FlatSpec
+import java.io.{ByteArrayOutputStream, PrintStream}
 
-class MainTest extends FlatSpec {
+import org.scalatest.{BeforeAndAfter, FunSuite}
 
-  "sum on List(1,2,3)" should "equal 6" in {
-    val list = List(1,2,3)
-    assert(list.sum === 6)
+import scala.io.Source
+
+class MainTest extends FunSuite with BeforeAndAfter {
+  val outStream: ByteArrayOutputStream = new ByteArrayOutputStream()
+
+  test("Integration test") {
+    Console.withOut(outStream) {
+      val filePath = getClass.getResource("input.txt").getPath
+      Main.main(Array(filePath))
+    }
+
+    val expected = Source.fromResource("output.txt").getLines
+
+    assert(outStream.toString().trim === expected.mkString("\n"))
   }
 }
