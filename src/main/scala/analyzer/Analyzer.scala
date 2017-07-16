@@ -1,4 +1,6 @@
-import Analysis.{PriceRatioAnalysis, PriceRatio}
+package analyzer
+
+import analyzer.Analysis.{PriceRatio, PriceRatioAnalysis}
 
 case class Analyzer (previousWindow: Stream[PriceRatio], priceRatio: PriceRatio) {
   def getAnalysis(windowLength: Int): PriceRatioAnalysis = {

@@ -1,6 +1,8 @@
+package analyzer
+
 import java.time.Instant
 
-import Analysis.{PriceRatio, PriceRatioAnalysis}
+import analyzer.Analysis.{PriceRatio, PriceRatioAnalysis}
 import org.scalatest.FunSpec
 
 class AnalysisTest extends FunSpec {
@@ -13,12 +15,12 @@ class AnalysisTest extends FunSpec {
   }
 
   describe("Analysis") {
-    it("should stringify analysis") {
+    it("should format analysis") {
       val priceRatio = PriceRatio(Instant.ofEpochSecond(1355270609), 1.80215)
 
       val analysis = PriceRatioAnalysis(priceRatio, 1, 1.80215, 1.80215, 1.80215)
 
-      assert(analysis.toString === "1355270609 1.80215 1 1.80215 1.80215 1.80215")
+      assert(analysis.formatted === "1355270609  1.80215   1    1.80215   1.80215   1.80215")
     }
 
     it("should round up decimal precision to 5 digits") {
@@ -26,7 +28,7 @@ class AnalysisTest extends FunSpec {
 
       val analysis = PriceRatioAnalysis(priceRatio, 1, 1.80215078, 1.802156789, 1.8021567890)
 
-      assert(analysis.toString === "1355270609 1.80216 1 1.80215 1.80216 1.80216")
+      assert(analysis.formatted === "1355270609  1.80216   1    1.80215   1.80216   1.80216")
     }
 
     it("should trim tailing zeros") {
@@ -34,7 +36,7 @@ class AnalysisTest extends FunSpec {
 
       val analysis = PriceRatioAnalysis(priceRatio, 1, 1.80200, 1.80200, 1.80200)
 
-      assert(analysis.toString === "1355270609 1.802 1 1.802 1.802 1.802")
+      assert(analysis.formatted === "1355270609  1.802     1    1.802     1.802     1.802")
     }
   }
 }

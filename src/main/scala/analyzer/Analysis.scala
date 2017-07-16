@@ -1,5 +1,8 @@
+package analyzer
+
 import java.time.Instant
-import java.text.DecimalFormat
+
+import utils.Formatter.{formatDouble, formatRow}
 
 object Analysis {
   type Ratio = Double
@@ -11,15 +14,11 @@ object Analysis {
   }
 
   case class PriceRatioAnalysis(priceRatio: PriceRatio, n: Int, rs: Ratio, minV: Ratio, maxV: Ratio) {
-    val format = new DecimalFormat("0.#####")
-
-    private def formatDouble(x: Double): String = format.format(x)
-
-    override def toString: String = Array(
-      priceRatio.timestamp.getEpochSecond,
+    def formatted: String = formatRow(
+      priceRatio.timestamp.getEpochSecond.toString,
       formatDouble(priceRatio.ratio),
-      n, formatDouble(rs), formatDouble(minV), formatDouble(maxV)
+      n.toString, formatDouble(rs), formatDouble(minV), formatDouble(maxV)
     )
-      .mkString(" ")
   }
+
 }

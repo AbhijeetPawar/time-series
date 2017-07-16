@@ -1,6 +1,8 @@
+package analyzer
+
 import java.time.Instant
 
-import Analysis.{PriceRatio, PriceRatioAnalysis}
+import analyzer.Analysis.{PriceRatio, PriceRatioAnalysis}
 import org.scalatest.{FunSpec, Matchers}
 
 class AnalyzerTest extends FunSpec with Matchers {

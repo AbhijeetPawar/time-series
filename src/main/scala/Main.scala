@@ -1,16 +1,20 @@
 import java.time.Instant
 
-import Analysis.PriceRatio
+import analyzer.Analysis.PriceRatio
+import analyzer.Analyzer
+import utils.Formatter
 
 import scala.io.Source
 
 object Main {
+
   def main(args: Array[String]): Unit = {
     val Array(filePath, window, _*) = args
 
-    val execute = parse _ andThen Analyzer.analyze andThen evaluate(window.toInt)
+    val runner = parse _ andThen Analyzer.analyze andThen evaluate(window.toInt)
 
-    execute(filePath)
+    printHeader()
+    runner(filePath)
   }
 
   private def parse(filePath: String): Iterator[PriceRatio] = {
@@ -23,7 +27,12 @@ object Main {
   private def evaluate(window: Int)(analyzers: Iterator[Analyzer]): Unit = {
     analyzers
       .map(analyzer => analyzer.getAnalysis(window))
-      .foreach(println)
+      .foreach(analysis => println(analysis.formatted))
+  }
+
+  private def printHeader(): Unit = {
+    println(Formatter.formatRow("T", "V", "N", "RS", "MinV", "MaxV"))
+    println("------------------------------------------------------------")
   }
 
 }
