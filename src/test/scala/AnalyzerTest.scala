@@ -12,7 +12,7 @@ class AnalyzerTest extends FunSpec {
 
       val nextAnalyzer = analyzer.create(priceRatio)
 
-      assert(nextAnalyzer === CurrentAnalyzer(List(), priceRatio))
+      assert(nextAnalyzer === CurrentAnalyzer(Stream(), priceRatio))
     }
 
     it("should throw UnsupportedOperationException on analyze") {
@@ -24,27 +24,27 @@ class AnalyzerTest extends FunSpec {
     it("should create next analyzer given next priceRatio sample") {
       val priceRatio = PriceRatio(Instant.ofEpochSecond(600), 1.805)
       val priceRatioNext = PriceRatio(Instant.ofEpochSecond(601), 1.900)
-      val analyzer = CurrentAnalyzer(List(), priceRatio)
+      val analyzer = CurrentAnalyzer(Stream(), priceRatio)
 
       val nextAnalyzer = analyzer.create(priceRatioNext)
 
-      assert(nextAnalyzer === CurrentAnalyzer(List(priceRatio), priceRatioNext))
+      assert(nextAnalyzer === CurrentAnalyzer(Stream(priceRatio), priceRatioNext))
     }
 
     it("should create next analyzer filtering previous ratios if they are outside window") {
       val priceRatio = PriceRatio(Instant.ofEpochSecond(600), 1.805)
       val priceRatioNext = PriceRatio(Instant.ofEpochSecond(661), 1.900)
-      val analyzer = CurrentAnalyzer(List(), priceRatio)
+      val analyzer = CurrentAnalyzer(Stream(), priceRatio)
 
       val nextAnalyzer = analyzer.create(priceRatioNext)
 
-      assert(nextAnalyzer === CurrentAnalyzer(List(), priceRatioNext))
+      assert(nextAnalyzer === CurrentAnalyzer(Stream(), priceRatioNext))
     }
 
     it("should analyze new price ratio when no previous analysis present") {
       val priceRatio = PriceRatio(Instant.ofEpochSecond(600), 1.805)
 
-      val analyzer = CurrentAnalyzer(List(), priceRatio)
+      val analyzer = CurrentAnalyzer(Stream(), priceRatio)
 
       assert(analyzer.analyze() === Analysis.Analysis(priceRatio, 1, 1.805, 1.805, 1.805))
     }
@@ -53,9 +53,9 @@ class AnalyzerTest extends FunSpec {
       val priceRatio1 = PriceRatio(Instant.ofEpochSecond(600), 1.805)
       val priceRatio2 = PriceRatio(Instant.ofEpochSecond(601), 1.900)
 
-      val analyzer = CurrentAnalyzer(List(priceRatio1), priceRatio2)
+      val analyzer = CurrentAnalyzer(Stream(priceRatio1), priceRatio2)
 
-      assert(analyzer.analyze() === Analysis.Analysis(priceRatio2, 2, 3.705, 1.9, 1.805))
+      assert(analyzer.analyze() === Analysis.Analysis(priceRatio2, 2, 3.705, 1.805, 1.9))
     }
 
     it("should analyze new price ratio for time window 60s") {
@@ -63,7 +63,7 @@ class AnalyzerTest extends FunSpec {
       val priceRatio2 = PriceRatio(Instant.ofEpochSecond(601), 1.9)
       val priceRatio3 = PriceRatio(Instant.ofEpochSecond(660), 1.9)
 
-      val analyzer = CurrentAnalyzer(List(priceRatio2, priceRatio1), priceRatio3)
+      val analyzer = CurrentAnalyzer(Stream(priceRatio1), priceRatio2).create(priceRatio3)
 
       assert(analyzer.analyze() === Analysis.Analysis(priceRatio3, 2, 3.8, 1.9, 1.9))
     }
