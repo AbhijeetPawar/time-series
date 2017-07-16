@@ -5,67 +5,64 @@ import org.scalatest.FunSpec
 
 class AnalyzerTest extends FunSpec {
 
-  describe("EmptyAnalyzer") {
-    it("should create current analyzer given next priceRatio sample") {
+  describe("Analyzer") {
+    it("should create analyzer given priceRatio sample") {
       val priceRatio = PriceRatio(Instant.ofEpochSecond(600), 1.805)
-      val analyzer = EmptyAnalyzer
 
-      val nextAnalyzer = analyzer.create(60, priceRatio)
+      val analyzer = Analyzer.create(priceRatio)
 
-      assert(nextAnalyzer === CurrentAnalyzer(Stream(), priceRatio))
+      assert(analyzer === Analyzer(Stream(), priceRatio))
     }
 
-    it("should throw UnsupportedOperationException on analyze") {
-      assertThrows[UnsupportedOperationException](EmptyAnalyzer.analyze())
+    it("should create next analyzer given next priceRatio sample") {
+      val priceRatio1 = PriceRatio(Instant.ofEpochSecond(600), 1.805)
+      val priceRatio2 = PriceRatio(Instant.ofEpochSecond(601), 1.900)
+      val analyzer = Analyzer(Stream(), priceRatio1)
+
+      val nextAnalyzer = Analyzer.create(priceRatio2, analyzer)
+
+      assert(nextAnalyzer === Analyzer(Stream(priceRatio1), priceRatio2))
+    }
+
+    it("should create next analyzer based on previous window") {
+      val priceRatio1 = PriceRatio(Instant.ofEpochSecond(600), 1.805)
+      val priceRatio2 = PriceRatio(Instant.ofEpochSecond(601), 1.9)
+      val priceRatio3 = PriceRatio(Instant.ofEpochSecond(660), 1.9)
+
+      val analyzer = Analyzer.create(priceRatio3, Analyzer(Stream(priceRatio1), priceRatio2))
+
+      assert(analyzer === Analyzer(Stream(priceRatio2, priceRatio1), priceRatio3))
     }
   }
 
-  describe("CurrentAnalyzer") {
-    it("should create next analyzer given next priceRatio sample") {
-      val priceRatio = PriceRatio(Instant.ofEpochSecond(600), 1.805)
-      val priceRatioNext = PriceRatio(Instant.ofEpochSecond(601), 1.900)
-      val analyzer = CurrentAnalyzer(Stream(), priceRatio)
-
-      val nextAnalyzer = analyzer.create(60, priceRatioNext)
-
-      assert(nextAnalyzer === CurrentAnalyzer(Stream(priceRatio), priceRatioNext))
-    }
-
-    it("should create next analyzer filtering previous ratios if they are outside window") {
-      val priceRatio = PriceRatio(Instant.ofEpochSecond(600), 1.805)
-      val priceRatioNext = PriceRatio(Instant.ofEpochSecond(661), 1.900)
-      val analyzer = CurrentAnalyzer(Stream(), priceRatio)
-
-      val nextAnalyzer = analyzer.create(60, priceRatioNext)
-
-      assert(nextAnalyzer === CurrentAnalyzer(Stream(), priceRatioNext))
-    }
+  describe("Analysis") {
+    val window = 60
 
     it("should analyze new price ratio when no previous analysis present") {
       val priceRatio = PriceRatio(Instant.ofEpochSecond(600), 1.805)
 
-      val analyzer = CurrentAnalyzer(Stream(), priceRatio)
+      val analyzer = Analyzer(Stream(), priceRatio)
 
-      assert(analyzer.analyze() === Analysis.Analysis(priceRatio, 1, 1.805, 1.805, 1.805))
+      assert(analyzer.analyze(window) === Analysis.Analysis(priceRatio, 1, 1.805, 1.805, 1.805))
     }
 
     it("should analyze new price ratio when previous analysis present in same time window") {
       val priceRatio1 = PriceRatio(Instant.ofEpochSecond(600), 1.805)
       val priceRatio2 = PriceRatio(Instant.ofEpochSecond(601), 1.900)
 
-      val analyzer = CurrentAnalyzer(Stream(priceRatio1), priceRatio2)
+      val analyzer = Analyzer(Stream(priceRatio1), priceRatio2)
 
-      assert(analyzer.analyze() === Analysis.Analysis(priceRatio2, 2, 3.705, 1.805, 1.9))
+      assert(analyzer.analyze(window) === Analysis.Analysis(priceRatio2, 2, 3.705, 1.805, 1.9))
     }
 
-    it("should analyze new price ratio for time window 60s") {
+    it("should analyze new price ratio for given time window") {
       val priceRatio1 = PriceRatio(Instant.ofEpochSecond(600), 1.805)
       val priceRatio2 = PriceRatio(Instant.ofEpochSecond(601), 1.9)
       val priceRatio3 = PriceRatio(Instant.ofEpochSecond(660), 1.9)
 
-      val analyzer = CurrentAnalyzer(Stream(priceRatio1), priceRatio2).create(60, priceRatio3)
+      val analyzer = Analyzer(Stream(priceRatio2, priceRatio1), priceRatio3)
 
-      assert(analyzer.analyze() === Analysis.Analysis(priceRatio3, 2, 3.8, 1.9, 1.9))
+      assert(analyzer.analyze(window) === Analysis.Analysis(priceRatio3, 2, 3.8, 1.9, 1.9))
     }
   }
 }
