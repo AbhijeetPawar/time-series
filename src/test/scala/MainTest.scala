@@ -1,4 +1,4 @@
-import java.io.{ByteArrayOutputStream, PrintStream}
+import java.io.ByteArrayOutputStream
 
 import org.scalatest.{BeforeAndAfter, FunSuite}
 
