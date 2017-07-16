@@ -10,7 +10,7 @@ class MainTest extends FunSuite with BeforeAndAfter {
   test("Integration test") {
     Console.withOut(outStream) {
       val filePath = getClass.getResource("input.txt").getPath
-      Main.main(Array(filePath))
+      Main.main(Array(filePath, "60"))
     }
 
     val expected = Source.fromResource("output.txt").getLines

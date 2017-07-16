@@ -6,10 +6,10 @@ import scala.io.Source
 
 object Main {
   def main(args: Array[String]): Unit = {
-    val filePath = args.head
+    val Array(filePath, window, _*) = args
 
     parser(filePath)
-      .scanLeft(EmptyAnalyzer: Analyzer) { (analyzer, pr) => analyzer.create(pr) }
+      .scanLeft(EmptyAnalyzer: Analyzer) { (analyzer, pr) => analyzer.create(window.toInt, pr) }
       .drop(1)
       .map(analyzer => analyzer.analyze())
       .foreach(println)

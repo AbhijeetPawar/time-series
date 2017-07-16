@@ -10,7 +10,7 @@ class AnalyzerTest extends FunSpec {
       val priceRatio = PriceRatio(Instant.ofEpochSecond(600), 1.805)
       val analyzer = EmptyAnalyzer
 
-      val nextAnalyzer = analyzer.create(priceRatio)
+      val nextAnalyzer = analyzer.create(60, priceRatio)
 
       assert(nextAnalyzer === CurrentAnalyzer(Stream(), priceRatio))
     }
@@ -26,7 +26,7 @@ class AnalyzerTest extends FunSpec {
       val priceRatioNext = PriceRatio(Instant.ofEpochSecond(601), 1.900)
       val analyzer = CurrentAnalyzer(Stream(), priceRatio)
 
-      val nextAnalyzer = analyzer.create(priceRatioNext)
+      val nextAnalyzer = analyzer.create(60, priceRatioNext)
 
       assert(nextAnalyzer === CurrentAnalyzer(Stream(priceRatio), priceRatioNext))
     }
@@ -36,7 +36,7 @@ class AnalyzerTest extends FunSpec {
       val priceRatioNext = PriceRatio(Instant.ofEpochSecond(661), 1.900)
       val analyzer = CurrentAnalyzer(Stream(), priceRatio)
 
-      val nextAnalyzer = analyzer.create(priceRatioNext)
+      val nextAnalyzer = analyzer.create(60, priceRatioNext)
 
       assert(nextAnalyzer === CurrentAnalyzer(Stream(), priceRatioNext))
     }
@@ -63,7 +63,7 @@ class AnalyzerTest extends FunSpec {
       val priceRatio2 = PriceRatio(Instant.ofEpochSecond(601), 1.9)
       val priceRatio3 = PriceRatio(Instant.ofEpochSecond(660), 1.9)
 
-      val analyzer = CurrentAnalyzer(Stream(priceRatio1), priceRatio2).create(priceRatio3)
+      val analyzer = CurrentAnalyzer(Stream(priceRatio1), priceRatio2).create(60, priceRatio3)
 
       assert(analyzer.analyze() === Analysis.Analysis(priceRatio3, 2, 3.8, 1.9, 1.9))
     }
