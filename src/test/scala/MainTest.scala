@@ -1,16 +1,17 @@
 import java.io.ByteArrayOutputStream
 
-import org.scalatest.{BeforeAndAfter, FunSuite}
+import org.scalatest.FunSuite
 
 import scala.io.Source
 
-class MainTest extends FunSuite with BeforeAndAfter {
+class MainTest extends FunSuite {
   val outStream: ByteArrayOutputStream = new ByteArrayOutputStream()
 
   test("Integration test") {
     Console.withOut(outStream) {
       val filePath = getClass.getResource("input.txt").getPath
-      Main.main(Array(filePath, "60"))
+      val window = "60"
+      Main.main(Array(filePath, window))
     }
 
     val expected = Source.fromResource("output.txt").getLines
