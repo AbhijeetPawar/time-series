@@ -1,30 +1,36 @@
 import Analysis.{Analysis, PriceRatio}
 
 case class Analyzer (previousWindow: Stream[PriceRatio], priceRatio: PriceRatio) {
-  def analyze(windowLength: Int): Analysis = {
+  def getAnalysis(windowLength: Int): Analysis = {
     previousWindow
-      .takeWhile(pr => windowed(windowLength, priceRatio, pr))
-      .map(r => r.analysis())
+      .takeWhile(ratio => windowed(windowLength, priceRatio, ratio))
+      .map(ratio => ratio.analysis())
       .foldLeft(priceRatio.analysis()) { (acc, next) =>
         Analysis.Analysis(acc.priceRatio, acc.n + 1, acc.rs + next.rs, Math.min(acc.minV, next.minV), Math.max(acc.maxV, next.maxV))
       }
   }
 
-  private def create(next: PriceRatio) = {
-    Analyzer(priceRatio #:: previousWindow, next)
+  private def create(nextSample: PriceRatio) = {
+    Analyzer(priceRatio #:: previousWindow, nextSample)
   }
 
-  private def windowed(windowLength: Int, next: PriceRatio, current: PriceRatio): Boolean = {
-    next.timestamp.minusSeconds(windowLength).isBefore(current.timestamp)
+  private def windowed(windowLength: Int, current: PriceRatio, previous: PriceRatio): Boolean = {
+    val windowStart = current.timestamp.minusSeconds(windowLength)
+    previous.timestamp.isAfter(windowStart)
   }
 }
 
 object Analyzer {
-  def create(priceRatio: PriceRatio): Analyzer = {
-    Analyzer(Stream(), priceRatio)
+
+  def analyze(ratios: Iterator[PriceRatio]): Iterator[Analyzer] = {
+    ratios
+      .scanLeft(Option.empty: Option[Analyzer]) { (analyzer, pr) =>
+        analyzer match {
+          case None => Option(Analyzer(Stream(), pr))
+          case Some(previousAnalyzer) => Option(previousAnalyzer.create(pr))
+        }
+      }
+      .flatten
   }
 
-  def create(priceRatio: PriceRatio, analyzer: Analyzer): Analyzer = {
-    analyzer.create(priceRatio)
-  }
 }

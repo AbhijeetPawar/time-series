@@ -15,7 +15,11 @@ object Analysis {
 
     private def formatDouble(x: Double): String = format.format(x)
 
-    override def toString: String = priceRatio.timestamp.getEpochSecond + " " + formatDouble(priceRatio.ratio) + " " +
-      n + " " + formatDouble(rs) + " " + formatDouble(minV) + " " + formatDouble(maxV)
+    override def toString: String = Array(
+      priceRatio.timestamp.getEpochSecond,
+      formatDouble(priceRatio.ratio),
+      n, formatDouble(rs), formatDouble(minV), formatDouble(maxV)
+    )
+      .mkString(" ")
   }
 }
