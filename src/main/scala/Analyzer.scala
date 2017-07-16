@@ -1,12 +1,12 @@
-import Analysis.{Analysis, PriceRatio}
+import Analysis.{PriceRatioAnalysis, PriceRatio}
 
 case class Analyzer (previousWindow: Stream[PriceRatio], priceRatio: PriceRatio) {
-  def getAnalysis(windowLength: Int): Analysis = {
+  def getAnalysis(windowLength: Int): PriceRatioAnalysis = {
     previousWindow
       .takeWhile(ratio => windowed(windowLength, priceRatio, ratio))
       .map(ratio => ratio.analysis())
       .foldLeft(priceRatio.analysis()) { (acc, next) =>
-        Analysis.Analysis(acc.priceRatio, acc.n + 1, acc.rs + next.rs, Math.min(acc.minV, next.minV), Math.max(acc.maxV, next.maxV))
+        PriceRatioAnalysis(acc.priceRatio, acc.n + 1, acc.rs + next.rs, Math.min(acc.minV, next.minV), Math.max(acc.maxV, next.maxV))
       }
   }
 

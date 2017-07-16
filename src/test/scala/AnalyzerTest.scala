@@ -1,6 +1,6 @@
 import java.time.Instant
 
-import Analysis.PriceRatio
+import Analysis.{PriceRatio, PriceRatioAnalysis}
 import org.scalatest.{FunSpec, Matchers}
 
 class AnalyzerTest extends FunSpec with Matchers {
@@ -36,7 +36,7 @@ class AnalyzerTest extends FunSpec with Matchers {
 
       val analyzer = Analyzer(Stream(), priceRatio)
 
-      assert(analyzer.getAnalysis(window) === Analysis.Analysis(priceRatio, 1, 1.805, 1.805, 1.805))
+      assert(analyzer.getAnalysis(window) === PriceRatioAnalysis(priceRatio, 1, 1.805, 1.805, 1.805))
     }
 
     it("should analyze new price ratio when previous analysis present in same time window") {
@@ -45,7 +45,7 @@ class AnalyzerTest extends FunSpec with Matchers {
 
       val analyzer = Analyzer(Stream(priceRatio1), priceRatio2)
 
-      assert(analyzer.getAnalysis(window) === Analysis.Analysis(priceRatio2, 2, 3.705, 1.805, 1.9))
+      assert(analyzer.getAnalysis(window) === PriceRatioAnalysis(priceRatio2, 2, 3.705, 1.805, 1.9))
     }
 
     it("should analyze new price ratio for given time window") {
@@ -55,7 +55,7 @@ class AnalyzerTest extends FunSpec with Matchers {
 
       val analyzer = Analyzer(Stream(priceRatio2, priceRatio1), priceRatio3)
 
-      assert(analyzer.getAnalysis(window) === Analysis.Analysis(priceRatio3, 2, 3.8, 1.9, 1.9))
+      assert(analyzer.getAnalysis(window) === PriceRatioAnalysis(priceRatio3, 2, 3.8, 1.9, 1.9))
     }
   }
 }
