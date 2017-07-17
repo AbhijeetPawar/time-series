@@ -3,6 +3,7 @@ package utils
 import java.text.DecimalFormat
 
 object Formatter {
+  val doubleFormatter = new DecimalFormat("0.#####")
 
   def formatRow(t: String, v: String, n: String, rs: String, minV: String, maxV: String): String = {
     leftPad(12, t) + leftPad(10, v) + leftPad(5, n) + leftPad(10, rs) + leftPad(10, minV) + maxV
@@ -13,8 +14,6 @@ object Formatter {
   }
 
   def formatDouble(x: Double): String = {
-    lazy val formatter = new DecimalFormat("0.#####")
-
-    formatter.format(x)
+    doubleFormatter.format(x)
   }
 }

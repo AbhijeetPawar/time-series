@@ -1,7 +1,7 @@
 
 *Build*
 $ sbt
-> package
+> compile
 
 *Run*
 $ sbt
