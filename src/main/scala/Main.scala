@@ -11,7 +11,7 @@ object Main {
   def main(args: Array[String]): Unit = {
     val Array(filePath, window, _*) = args
 
-    val runner = parse _ andThen Analyzer.analyze andThen evaluate(window.toInt)
+    val runner = parse _ andThen Analyzer.analyze(window.toInt) andThen evaluate
 
     printHeader()
     runner(filePath)
@@ -24,9 +24,9 @@ object Main {
       .map { case Array(ts, ratio, _*) => PriceRatio(Instant.ofEpochSecond(ts.toInt), ratio.toDouble) }
   }
 
-  private def evaluate(window: Int)(analyzers: Iterator[Analyzer]): Unit = {
+  private def evaluate(analyzers: Iterator[Analyzer]): Unit = {
     analyzers
-      .map(analyzer => analyzer.getAnalysis(window))
+      .map(analyzer => analyzer.getAnalysis)
       .foreach(analysis => println(analysis.formatted))
   }
 
